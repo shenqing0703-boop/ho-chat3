@@ -17,17 +17,22 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; width: 100%; overflow: hidden; background: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
         .chat-container { width: 100%; max-width: 500px; height: 100%; background: #fff; display: flex; flex-direction: column; margin: 0 auto; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
-        .chat-header { background: #00a854; color: white; padding: 15px; text-align: center; font-size: 16px; font-weight: bold; flex-shrink: 0; }
+        
+        /* ⚙️ 顶部条布局微调：支持 LOGO + 文字水平居中排列 */
+        .chat-header { background: #00a854; color: white; padding: 12px 15px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; flex-shrink: 0; gap: 8px; }
+        
+        /* 🔒 顶部 1:1 专属 LOGO 样式 */
+        .header-logo { width: 28px; height: 28px; border-radius: 4px; background-color: #fff; background-image: url("https://ho-chat3.pages.dev/logo.webp"); background-size: contain; background-position: center; background-repeat: no-repeat; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        
         #messages { flex: 1; padding: 15px; overflow-y: auto; background: #eaeaea; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
         .msg-row { display: flex; margin-bottom: 15px; width: 100%; align-items: flex-start; }
         .msg-row.user { justify-content: flex-end; }
         .msg-row.admin { justify-content: flex-start; }
         
-        /* 🔒 1:1 绝对不变形容器 */
         .avatar { width: 38px; height: 38px; border-radius: 50%; margin: 0 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); background-size: contain; background-position: center; background-repeat: no-repeat; }
         .user .avatar { background-color: #00bac7; } 
         
-        /* 🔒 粉丝端：聊天气泡旁的小樱头像，读取你的真图链接，保持 1:1 居中 */
+        /* 🔒 气泡旁的小樱头像，1:1 读取你上传的真图片 */
         .admin .avatar { 
             background-color: #fff; 
             border: 1px solid #eee;
@@ -47,7 +52,10 @@
 </head>
 <body>
 <div class="chat-container">
-    <div class="chat-header">HO体育客服官方线路</div>
+    <div class="chat-header">
+        <div class="header-logo"></div>
+        <span>HO体育客服官方线路</span>
+    </div>
     <div id="messages"></div>
     <div class="input-area">
         <label class="btn" style="background:#e9e9e9; color:#333; padding:0 12px; font-size:22px; margin-right:8px; border:1px solid #ccc; cursor:pointer;" for="file-input">📎</label>
@@ -67,7 +75,6 @@
     let userId = localStorage.getItem("chat_user_id3") || "粉丝_" + Math.random().toString(16).substring(2, 6); 
     localStorage.setItem("chat_user_id3", userId);
     
-    // 🌸 名字更新：客服小樱欢迎语
     const welcomeText = "欢迎来到HO体育！我是您的专属客服小樱。新博精选推荐每日更新，获取最新顶级联赛高清直播、实时主场动态及福利，请添加我们的专属专家账号，小樱全天候为您服务！"; 
     var imageItems = [];
 
@@ -94,7 +101,6 @@
             if (msg.sender === "user") { 
                 container.innerHTML = `<div class="msg-row user"><div class="bubble">${content}</div><div class="avatar">我</div></div>`; 
             } else { 
-                // 🌸 名字更新：HO体育-客服小樱
                 container.innerHTML = `<div class="bubble-name">HO体育-客服小樱</div><div class="msg-row admin"><div class="avatar"></div><div class="bubble">${content}</div></div>`; 
             }
             box.appendChild(container); 
