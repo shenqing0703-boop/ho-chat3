@@ -13,73 +13,57 @@
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100%; width: 100%; overflow: hidden; background: #f3f3f3; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif; }
+        html, body { height: 100%; width: 100%; overflow: hidden; background: #eaeaea; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
         
-        .chat-container { width: 100%; max-width: 500px; height: 100%; background: #f3f3f3; display: flex; flex-direction: column; margin: 0 auto; position: relative; }
+        .chat-container { width: 100%; max-width: 500px; height: 100%; background: #eaeaea; display: flex; flex-direction: column; margin: 0 auto; box-shadow: 0 0 20px rgba(0,0,0,0.08); }
         
-        /* 🌟 顶栏全面重构：高级轻乳白毛玻璃质感 */
         .chat-header { 
-            background: rgba(255, 255, 255, 0.88); 
-            backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px);
-            color: #1a1a1a; 
+            background: linear-gradient(180deg, #00b85c 0%, #00a854 100%); 
+            color: #ffffff; 
             padding: 14px 20px; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             font-size: 16px; 
-            font-weight: 600; 
+            font-weight: bold; 
             flex-shrink: 0; 
             gap: 10px; 
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 8px rgba(0, 168, 84, 0.25);
             z-index: 10;
         }
-        .header-logo { width: 26px; height: 26px; border-radius: 6px; background-image: url("https://ho-chat3.pages.dev/logo.webp"); background-size: contain; background-position: center; background-repeat: no-repeat; flex-shrink: 0; }
+        .header-logo { width: 30px; height: 30px; border-radius: 50%; background-color: #ffffff; background-image: url("https://ho-chat3.pages.dev/logo.webp"); background-size: 78%; background-position: center; background-repeat: no-repeat; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
-        /* 🌟 聊天区域 */
-        #messages { flex: 1; padding: 20px 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        #messages { flex: 1; padding: 18px 14px; overflow-y: auto; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; background: #eaeaea; }
         
-        .msg-container { width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; }
-        .msg-row { display: flex; width: 100%; align-items: flex-start; }
-        .msg-container.user .msg-row { justify-content: flex-end; }
-        .msg-container.admin .msg-row { justify-content: flex-start; }
+        .msg-row { display: flex; margin-bottom: 16px; width: 100%; align-items: flex-start; }
+        .msg-row.user { justify-content: flex-end; }
+        .msg-row.admin { justify-content: flex-start; }
         
-        /* 🌟 头像质感调优 */
-        .avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; background-size: contain; background-position: center; background-repeat: no-repeat; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
-        .admin .avatar { background-color: #fff; border: 1px solid rgba(0,0,0,0.05); background-image: url("https://ho-chat3.pages.dev/logo.webp"); margin-right: 12px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.06); background-size: contain; background-position: center; background-repeat: no-repeat; }
+        .user .avatar { background-color: #00bac7; margin-left: 10px; } 
         
-        /* 🌸 名字标签：采用轻盈小巧低调灰色 */
-        .bubble-name { font-size: 12px; color: #999; margin-left: 54px; margin-bottom: 5px; text-align: left; font-weight: 500; }
+        .admin .avatar { 
+            background-color: #ffffff; 
+            border: 1px solid rgba(0,0,0,0.05);
+            background-image: url("https://ho-chat3.pages.dev/logo.webp"); 
+            background-size: 82%;
+            margin-right: 10px; 
+        } 
         
-        /* 🌟 气泡全面蜕变：极致圆润流线型 */
-        .bubble { max-width: calc(100% - 100px); padding: 12px 16px; border-radius: 16px; font-size: 15px; line-height: 1.5; word-break: break-all; box-shadow: 0 1px 3px rgba(0,0,0,0.02); position: relative; }
+        .bubble-name { font-size: 11px; color: #777; margin-left: 52px; margin-bottom: 3px; text-align: left; font-weight: 500; }
         
-        /* 粉丝端：精细调色的柔和微信绿，去阴影 */
-        .msg-container.user .bubble { background: #95ec69; color: #111; border-top-right-radius: 4px; margin-right: 4px; }
+        .bubble { max-width: calc(100% - 106px); padding: 11px 15px; border-radius: 14px; font-size: 15px; line-height: 1.45; word-break: break-all; box-shadow: 0 2px 5px rgba(0,0,0,0.04); }
+        .user .bubble { background: #95ec69; color: #000; border-top-right-radius: 2px; }
+        .admin .bubble { background: #ffffff; color: #000; border-top-left-radius: 2px; border: 1px solid rgba(0,0,0,0.02); }
         
-        /* 客服端：带有极微立体感的纯白微光气泡 */
-        .msg-container.admin .bubble { background: #ffffff; color: #111; border-top-left-radius: 4px; border: 1px solid rgba(0,0,0,0.03); }
+        .bubble img { max-width: 100%; max-height: 260px; border-radius: 10px; margin-top: 2px; cursor: pointer; display: block; object-fit: contain; box-shadow: 0 3px 8px rgba(0,0,0,0.06); }
         
-        /* 🌟 图片发送渲染器调优：去除外层包裹绿底，干净透亮 */
-        .bubble-img-wrapper { max-width: calc(100% - 100px); }
-        .bubble-img-wrapper img { max-width: 100%; max-height: 250px; border-radius: 12px; cursor: pointer; display: block; object-fit: contain; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05); }
-        .msg-container.user .bubble-img-wrapper { margin-right: 4px; }
-        .msg-container.admin .bubble-img-wrapper { margin-left: 54px; }
-
-        /* 🌟 全新交互全白输入底盘 */
-        .input-area { display: flex; align-items: center; padding: 12px 16px; background: #f7f7f7; border-top: 1px solid rgba(0,0,0,0.08); flex-shrink: 0; padding-bottom: calc(12px + env(safe-area-inset-bottom)); gap: 10px; }
-        
-        /* 回形针按钮 */
-        .btn-file { background: #ffffff; border: 1px solid rgba(0,0,0,0.1); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .btn-file:active { background: #ededed; }
-        
-        /* 输入框 */
-        #msg-input { flex: 1; height: 40px; padding: 0 16px; border: 1px solid rgba(0,0,0,0.1); border-radius: 20px; outline: none; font-size: 15px; background: #fff; transition: all 0.2s; -webkit-appearance: none; }
+        .input-area { display: flex; align-items: center; padding: 10px 14px; background: #f6f6f6; border-top: 1px solid #dcdcdb; flex-shrink: 0; padding-bottom: calc(10px + env(safe-area-inset-bottom)); gap: 8px; }
+        .btn-file { background: #ffffff; border: 1px solid #d3d3d2; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        #msg-input { flex: 1; height: 38px; padding: 0 14px; border: 1px solid #d3d3d2; border-radius: 19px; outline: none; font-size: 15px; background: #fff; -webkit-appearance: none; }
         #msg-input:focus { border-color: #00a854; }
-        
-        /* 发送按钮 */
-        .btn-send { background: #00a854; color: white; border: none; height: 40px; padding: 0 22px; border-radius: 20px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; -webkit-appearance: none; }
-        .btn-send:active { background: #008f47; opacity: 0.9; }
+        .btn-send { background: #00a854; color: white; border: none; height: 38px; padding: 0 18px; border-radius: 19px; font-size: 14px; font-weight: bold; cursor: pointer; flex-shrink: 0; -webkit-appearance: none; }
+        .btn-send:active { background: #008f47; }
     </style>
 </head>
 <body>
@@ -107,8 +91,11 @@
     let userId = localStorage.getItem("chat_user_id3") || "粉丝_" + Math.random().toString(16).substring(2, 6); 
     localStorage.setItem("chat_user_id3", userId);
     
-    const welcomeText = "欢迎来到HO体育！我是您的专属客服小樱。新博精选推荐每日更新，获取最新顶级联赛高清直播、实时主场动态及福利，请添加我们的专属专家账号，小樱全天候为您服务！"; 
+    // 🌸 话术无缝换新
+    const welcomeFirst = "您好，很高兴为您服务，有什么可以为您效劳的？";
+    const welcomeText = "欢迎来到HO体育！我是您的专属客服小樱。HO精选推荐每日更新，获取最新顶级联赛高清直播、实时主场动态及福利，人工客服正在火速赶到，你可以先描述你的问题。"; 
     var imageItems = [];
+    var hasAdminReplied = false; // 智能拦截开关
 
     window.onload = function() {
         const firebaseConfig = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com" };
@@ -123,37 +110,71 @@
         const box = document.getElementById("messages");
         db.ref("chats3/" + userId + "/messages").on("child_added", snap => {
             const msg = snap.val(); 
-            const container = document.createElement("div"); 
-            container.className = "msg-container " + (msg.sender === "user" ? "user" : "admin");
             
+            // 🔒 智能防撞车检测：如果在5秒内，发现有非自动回复的人工客服说话了，打上标记
+            if (msg.sender === "admin" && msg.text !== welcomeFirst && msg.text !== welcomeText) {
+                hasAdminReplied = true;
+            }
+
+            const container = document.createElement("div"); 
+            container.style.width = "100%";
+            container.style.marginBottom = "15px";
+            
+            let content; 
             if (msg.type === "image") { 
                 const imgIndex = imageItems.length; 
                 imageItems.push({ src: msg.url, w: 1000, h: 1000 }); 
-                
-                // 🎨 核心修复：发送图片不套气泡，直接走高清独立图片轨
-                if (msg.sender === "user") {
-                    container.innerHTML = `<div class="msg-row"><div class="bubble-img-wrapper"><img src="${msg.url}" onclick="openPhotoSwipe(${imgIndex})" onload="updateImageSize(this, ${imgIndex})" /></div></div>`;
-                } else {
-                    container.innerHTML = `<div class="bubble-name">HO体育-客服小樱</div><div class="msg-row"><div class="avatar"></div><div class="bubble-img-wrapper"><img src="${msg.url}" onclick="openPhotoSwipe(${imgIndex})" onload="updateImageSize(this, ${imgIndex})" /></div></div>`;
-                }
-            } else { 
-                // 🎨 核心修复：文字走全新微信流线型圆角气泡，且右侧粉丝不挂突兀圆圈
-                if (msg.sender === "user") { 
-                    container.innerHTML = `<div class="msg-row"><div class="bubble">${msg.text}</div></div>`; 
-                } else { 
-                    container.innerHTML = `<div class="bubble-name">HO体育-客服小樱</div><div class="msg-row"><div class="avatar"></div><div class="bubble">${msg.text}</div></div>`; 
-                }
-            }
+                content = `<img src="${msg.url}" onclick="openPhotoSwipe(${imgIndex})" onload="updateImageSize(this, ${imgIndex})" />`; 
+            } else { content = msg.text; }
             
+            if (msg.sender === "user") { 
+                container.innerHTML = `<div class="msg-row user"><div class="bubble">${content}</div><div class="avatar">我</div></div>`; 
+            } else { 
+                container.innerHTML = `<div class="bubble-name">HO体育-客服小樱</div><div class="msg-row admin"><div class="avatar"></div><div class="bubble">${content}</div></div>`; 
+            }
             box.appendChild(container); 
             setTimeout(() => { box.scrollTop = box.scrollHeight; }, 100);
         });
+
+        checkAndTriggerFirstWelcome();
     }
 
-    function sendText() { const input = document.getElementById("msg-input"); const text = input.value.trim(); if (!text || !db) return; pushMsg({ sender: "user", type: "text", text: text, timestamp: Date.now() }); input.value = ""; checkAndAutoReply(); }
-    function checkAndAutoReply() { db.ref("chats3/" + userId + "/messages").once("value", snap => { let count = 0; snap.forEach(() => { count++; }); if (count === 1) { setTimeout(() => { db.ref("chats3/" + userId + "/messages").push({ sender: "admin", type: "text", text: welcomeText, timestamp: Date.now() }); db.ref("chats3/" + userId + "/info").set({ lastMsg: "小樱: " + welcomeText, timestamp: Date.now() }); }, 1000); } }); }
+    // 🚀 一进门 0.5 秒秒发第一句，并开启“5秒智能防撞车拦截器”
+    function checkAndTriggerFirstWelcome() {
+        db.ref("chats3/" + userId + "/messages").once("value", snap => {
+            if (!snap.exists()) {
+                setTimeout(() => {
+                    db.ref("chats3/" + userId + "/messages").push({ sender: "admin", type: "text", text: welcomeFirst, timestamp: Date.now() });
+                    db.ref("chats3/" + userId + "/info").set({ lastMsg: "小樱: " + welcomeFirst, timestamp: Date.now() });
+                    
+                    // ⏱️【精准 5 秒延时器】：5 秒后检查，如果没有真人客服插足，自动发送引流长文
+                    start5SecondTimer();
+                }, 500);
+            }
+        });
+    }
+
+    function start5SecondTimer() {
+        setTimeout(() => {
+            // 🔒 核心拦截：如果 5 秒内人工客服已经发送过消息，或者粉丝已经看过了，直接拦截，拒绝发送自动消息
+            if (hasAdminReplied) return; 
+            
+            db.ref("chats3/" + userId + "/messages").once("value", snap => {
+                let hasLongText = false;
+                snap.forEach(child => { if (child.val().text === welcomeText) hasLongText = true; });
+                
+                // 确保没发过，直接完美推出
+                if (!hasLongText) {
+                    db.ref("chats3/" + userId + "/messages").push({ sender: "admin", type: "text", text: welcomeText, timestamp: Date.now() }); 
+                    db.ref("chats3/" + userId + "/info").set({ lastMsg: "小樱: " + welcomeText, timestamp: Date.now() });
+                }
+            });
+        }, 5000); // 🔒 严格死锁 5000 毫秒（5秒）
+    }
+
+    function sendText() { const input = document.getElementById("msg-input"); const text = input.value.trim(); if (!text || !db) return; pushMsg({ sender: "user", type: "text", text: text, timestamp: Date.now() }); input.value = ""; }
     function pushMsg(msgObj) { db.ref("chats3/" + userId + "/messages").push(msgObj); db.ref("chats3/" + userId + "/info").set({ lastMsg: msgObj.type === "image" ? "[图片]" : msgObj.text, timestamp: Date.now() }); }
-    function uploadFile(input) { const file = input.files[0]; if (!file || !db) return; const inputField = document.getElementById("msg-input"); inputField.placeholder = "正在加密传输图像..."; inputField.disabled = true; const reader = new FileReader(); reader.onload = function(e) { inputField.placeholder = "请输入您的问题..."; inputField.disabled = false; pushMsg({ sender: "user", type: "image", url: e.target.result, timestamp: Date.now() }); checkAndAutoReply(); }; reader.readAsDataURL(file); }
+    function uploadFile(input) { const file = input.files[0]; if (!file || !db) return; const inputField = document.getElementById("msg-input"); inputField.placeholder = "正在加密传输图像..."; inputField.disabled = true; const reader = new FileReader(); reader.onload = function(e) { inputField.placeholder = "请输入您的问题..."; inputField.disabled = false; pushMsg({ sender: "user", type: "image", url: e.target.result, timestamp: Date.now() }); }; reader.readAsDataURL(file); }
     function updateImageSize(imgHtml, index) { if (imageItems[index]) { imageItems[index].w = imgHtml.naturalWidth || 1000; imageItems[index].h = imgHtml.naturalHeight || 1000; } }
     function openPhotoSwipe(index) { var pswpElement = document.querySelectorAll('.pswp')[0]; var options = { index: index, bgOpacity: 0.85, showHideOpacity: true, history: false, shareEl: false, tapToClose: true }; var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, imageItems, options); gallery.init(); }
 </script>
