@@ -2,10 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    
     <title>HO体育客服官方线路 - 管理后台</title>
     
-    <link id="web-icon" rel="shortcut icon" type="image/x-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M15 25 L35 65 L50 40 L65 65 L85 25 L70 25 L50 55 L30 25 Z' fill='%2300baef'/><path d='M35 65 L50 85 L65 65 L50 55 Z' fill='%239dd423'/></svg>">
+    <link id="web-icon" rel="shortcut icon" type="image/x-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='white'/><path d='M15 25 L35 65 L50 40 L65 65 L85 25 L70 25 L50 55 L30 25 Z' fill='%2300baef'/><path d='M35 65 L50 85 L65 65 L50 55 Z' fill='%239dd423'/></svg>">
     
     <script src="https://cdn.staticfile.org/firebase/8.10.1/firebase-app.js"></script>
     <script src="https://cdn.staticfile.org/firebase/8.10.1/firebase-database.js"></script>
@@ -27,28 +26,33 @@
         .chat-item.has-new .badge { display: block; }
         .main-chat { flex: 1; display: flex; flex-direction: column; background: #f5f5f5; }
         .main-header { padding: 15px; background: #fff; font-size: 16px; font-weight: bold; border-bottom: 1px solid #e8e8e8; display: flex; align-items: center; }
-        /* 后台主面板顶部大头像 */
+        
+        /* 🔒 后台顶栏 1:1 高清居中大头像 */
         .header-avatar { 
-            width: 34px; height: 34px; border-radius: 50%; background-color: #fff; border: 1px solid #eee; margin-right: 10px; background-size: 80%; background-position: center; background-repeat: no-repeat; 
+            width: 34px; height: 34px; border-radius: 50%; background-color: #fff; border: 1px solid #eee; margin-right: 10px; background-size: 85%; background-position: center; background-repeat: no-repeat; 
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M15 25 L35 65 L50 40 L65 65 L85 25 L70 25 L50 55 L30 25 Z' fill='%2300baef'/><path d='M35 65 L50 85 L65 65 L50 55 Z' fill='%239dd423'/></svg>");
         }
         #messages { flex: 1; padding: 20px; overflow-y: auto; background: #f4f5f7; scroll-behavior: smooth; }
         .msg-row { display: flex; margin-bottom: 15px; width: 100%; align-items: flex-start; }
         .msg-row.admin { justify-content: flex-end; }
         .msg-row.user { justify-content: flex-start; }
-        .avatar { width: 38px; height: 38px; border-radius: 50%; margin: 0 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); background-size: 80%; background-position: center; background-repeat: no-repeat; }
+        
+        .avatar { width: 38px; height: 38px; border-radius: 50%; margin: 0 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); background-size: contain; background-position: center; background-repeat: no-repeat; }
         .user .avatar { background-color: #00bac7; } 
-        /* 🎨 后台聊天气泡旁的客服头像 */
+        
+        /* 🔒 后台聊天气泡旁的客服头像 1:1 绝对不变形 */
         .admin .avatar { 
             background-color: #fff; 
             border: 1px solid #eee;
+            background-size: 85% 85%;
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M15 25 L35 65 L50 40 L65 65 L85 25 L70 25 L50 55 L30 25 Z' fill='%2300baef'/><path d='M35 65 L50 85 L65 65 L50 55 Z' fill='%239dd423'/></svg>");
         } 
+        
         .bubble-name { font-size: 12px; color: #888; margin-bottom: 2px; text-align: right; margin-right: 58px; }
         .bubble { max-width: calc(65% - 48px); padding: 11px 15px; border-radius: 8px; font-size: 14px; line-height: 1.5; word-break: break-all; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .admin .bubble { background: #95ec69; color: #000; border-top-right-radius: 0; }
         .user .bubble { background: #fff; color: #000; border-top-left-radius: 0; }
-        .bubble img { max-width: 100%; border-radius: 4px; margin-top: 5px; cursor: pointer; display: block; }
+        .bubble img { max-width: 100%; border-radius: 4px; margin-top: 5px; cursor: pointer; display: block; object-fit: contain; }
         .input-area { display: flex; align-items: center; padding: 15px; background: #fff; border-top: 1px solid #e8e8e8; }
         #msg-input { flex: 1; height: 42px; padding: 0 15px; border: 1px solid #d9d9d9; border-radius: 4px; outline: none; font-size: 14px; }
         .btn { height: 42px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
@@ -124,7 +128,6 @@
                 let content = msg.text;
                 if (msg.type === "image") { const imgIndex = currentChatImageItems.length; currentChatImageItems.push({ src: msg.url, w: 1000, h: 1000 }); content = `<img src="${msg.url}" onclick="openAdminPhotoSwipe(${imgIndex})" onload="updateAdminImageSize(this, ${imgIndex})" />`; }
                 if (msg.sender === "admin") { 
-                    // 🌸 名字升级：HO体育-客服小樱
                     container.innerHTML = `<div class="bubble-name">HO体育-客服小樱</div><div class="msg-row admin"><div class="bubble">${content}</div><div class="avatar"></div></div>`; 
                 } else { 
                     container.innerHTML = `<div class="msg-row user"><div class="avatar">粉</div><div class="bubble">${content}</div></div>`; 
