@@ -91,11 +91,10 @@
     let userId = localStorage.getItem("chat_user_id3") || "粉丝_" + Math.random().toString(16).substring(2, 6); 
     localStorage.setItem("chat_user_id3", userId);
     
-    // 🌸 话术无缝换新
     const welcomeFirst = "您好，很高兴为您服务，有什么可以为您效劳的？";
     const welcomeText = "欢迎来到HO体育！我是您的专属客服小樱。HO精选推荐每日更新，获取最新顶级联赛高清直播、实时主场动态及福利，人工客服正在火速赶到，你可以先描述你的问题。"; 
     var imageItems = [];
-    var hasAdminReplied = false; // 智能拦截开关
+    var hasAdminReplied = false; 
 
     window.onload = function() {
         const firebaseConfig = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com" };
@@ -111,7 +110,7 @@
         db.ref("chats3/" + userId + "/messages").on("child_added", snap => {
             const msg = snap.val(); 
             
-            // 🔒 智能防撞车检测：如果在5秒内，发现有非自动回复的人工客服说话了，打上标记
+            // 🔒 智能防撞车：只要发现人工在20秒内抢先回话了，打上中断标记
             if (msg.sender === "admin" && msg.text !== welcomeFirst && msg.text !== welcomeText) {
                 hasAdminReplied = true;
             }
@@ -139,7 +138,6 @@
         checkAndTriggerFirstWelcome();
     }
 
-    // 🚀 一进门 0.5 秒秒发第一句，并开启“5秒智能防撞车拦截器”
     function checkAndTriggerFirstWelcome() {
         db.ref("chats3/" + userId + "/messages").once("value", snap => {
             if (!snap.exists()) {
@@ -147,29 +145,28 @@
                     db.ref("chats3/" + userId + "/messages").push({ sender: "admin", type: "text", text: welcomeFirst, timestamp: Date.now() });
                     db.ref("chats3/" + userId + "/info").set({ lastMsg: "小樱: " + welcomeFirst, timestamp: Date.now() });
                     
-                    // ⏱️【精准 5 秒延时器】：5 秒后检查，如果没有真人客服插足，自动发送引流长文
-                    start5SecondTimer();
+                    // ⏱️【已全面升级为严格 20 秒倒计时机制】
+                    start20SecondTimer();
                 }, 500);
             }
         });
     }
 
-    function start5SecondTimer() {
+    function start20SecondTimer() {
         setTimeout(() => {
-            // 🔒 核心拦截：如果 5 秒内人工客服已经发送过消息，或者粉丝已经看过了，直接拦截，拒绝发送自动消息
+            // 🔒 拦截判断：如果 20 秒内人工客服已经说过了任何话，直接拦截作废，绝不弹广告
             if (hasAdminReplied) return; 
             
             db.ref("chats3/" + userId + "/messages").once("value", snap => {
                 let hasLongText = false;
                 snap.forEach(child => { if (child.val().text === welcomeText) hasLongText = true; });
                 
-                // 确保没发过，直接完美推出
                 if (!hasLongText) {
                     db.ref("chats3/" + userId + "/messages").push({ sender: "admin", type: "text", text: welcomeText, timestamp: Date.now() }); 
                     db.ref("chats3/" + userId + "/info").set({ lastMsg: "小樱: " + welcomeText, timestamp: Date.now() });
                 }
             });
-        }, 5000); // 🔒 严格死锁 5000 毫秒（5秒）
+        }, 20000); // 🔒 严格死锁 20000 毫秒（20秒）
     }
 
     function sendText() { const input = document.getElementById("msg-input"); const text = input.value.trim(); if (!text || !db) return; pushMsg({ sender: "user", type: "text", text: text, timestamp: Date.now() }); input.value = ""; }
