@@ -68,16 +68,8 @@
     <script>
         var db; var currentChat = null; var unreadChats = {}; var flashInterval = null; var currentChatImageItems = [];
         window.onload = function() {
-            // 🔥 后台同样把全套密码请回来，彻底恢复双向监听！
-            const firebaseConfig = { 
-                apiKey: "AIzaSyDDs2uCueE3NJdZZxpMGp-1Snrt34E4nf0",
-                authDomain: "chat-system-87d17.firebaseapp.com",
-                databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com",
-                projectId: "chat-system-87d17",
-                storageBucket: "chat-system-87d17.firebasestorage.app",
-                messagingSenderId: "988901895318",
-                appId: "1:988901895318:web:b1736c54a224570253a6b7"
-            };
+            // ⭐ 后台同步换成“免授权无痕直连驱动”：彻底拔掉谷歌跨域认证的大钉子
+            const firebaseConfig = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com" };
             if (typeof firebase !== 'undefined') { if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } db = firebase.database(); initAdminList(); }
         };
         function initAdminList() {
