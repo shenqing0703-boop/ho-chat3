@@ -22,7 +22,6 @@
         .msg-row.admin { justify-content: flex-start; }
         .avatar { width: 38px; height: 38px; border-radius: 50%; margin: 0 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); background-size: cover; background-position: center; }
         .user .avatar { background-color: #00bac7; } 
-        /* 🎨 HO体育 专属圆圈黑底绿环 LOGO 头像 */
         .admin .avatar { 
             background-color: #000; 
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="black" stroke="%2300a854" stroke-width="3"/><text x="50" y="44" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="28" fill="white" dominant-baseline="middle" text-anchor="middle">HO</text><text x="50" y="74" font-family="SimHei, Microsoft YaHei, sans-serif" font-weight="bold" font-size="20" fill="%2300a854" dominant-baseline="middle" text-anchor="middle">体育</text></svg>'); 
@@ -43,7 +42,7 @@
     <div class="chat-header">HO体育 - 在线咨询</div>
     <div id="messages"></div>
     <div class="input-area">
-        <label class="btn" style="background:#e9e9e9; color:#333; padding:0 12px; font-size:22px; margin-right:8px; border:1px solid #ccc;" for="file-input">📎</label>
+        <label class="btn" style="background:#e9e9e9; color:#333; padding:0 12px; font-size:22px; margin-right:8px; border:1px solid #ccc; cursor:pointer;" for="file-input">📎</label>
         <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="uploadFile(this)">
         <input type="text" id="msg-input" placeholder="请输入您的问题..." onkeydown="if(event.keyCode==13) sendText()">
         <button class="btn-send" onclick="sendText()">发送</button>
@@ -64,8 +63,15 @@
     var imageItems = [];
 
     window.onload = function() {
+        // 🔒 重新顶回完整大厂密钥，强行激活脚本初始化
         const firebaseConfig = { 
-            databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com" // ⚡ 移除所有不必要的鉴权验证，直连实时数据库
+            apiKey: "AIzaSyDDs2uCueE3NJdZZxpMGp-1Snrt34E4nf0",
+            authDomain: "chat-system-87d17.firebaseapp.com",
+            databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com",
+            projectId: "chat-system-87d17",
+            storageBucket: "chat-system-87d17.firebasestorage.app",
+            messagingSenderId: "988901895318",
+            appId: "1:988901895318:web:b1736c54a224570253a6b7"
         };
         if (typeof firebase !== 'undefined') { 
             if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
