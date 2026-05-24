@@ -22,7 +22,7 @@
         .msg-row.admin { justify-content: flex-start; }
         .avatar { width: 38px; height: 38px; border-radius: 50%; margin: 0 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); background-size: cover; background-position: center; }
         .user .avatar { background-color: #00bac7; } 
-        /* 🎨 完美克隆 HO体育 专属圆圈黑底绿环 LOGO 头像 */
+        /* 🎨 HO体育 专属圆圈黑底绿环 LOGO 头像 */
         .admin .avatar { 
             background-color: #000; 
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="black" stroke="%2300a854" stroke-width="3"/><text x="50" y="44" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="28" fill="white" dominant-baseline="middle" text-anchor="middle">HO</text><text x="50" y="74" font-family="SimHei, Microsoft YaHei, sans-serif" font-weight="bold" font-size="20" fill="%2300a854" dominant-baseline="middle" text-anchor="middle">体育</text></svg>'); 
@@ -60,18 +60,22 @@
     let userId = localStorage.getItem("chat_user_id3") || "粉丝_" + Math.random().toString(16).substring(2, 6); 
     localStorage.setItem("chat_user_id3", userId);
     
-    // 📢 专属自动回复话术，随时可以直接在 GitHub 网页改字
     const welcomeText = "欢迎来到HO体育！新博精选推荐每日更新。获取最新顶级联赛高清直播、实时主场动态及福利，请添加我们的专属专家账号，我们有小姐姐全天候为您服务！"; 
     var imageItems = [];
 
     window.onload = function() {
-        const firebaseConfig = { apiKey: "AIzaSyDDs2uCueE3NJdZZxpMGp-1Snrt34E4nf0", authDomain: "chat-system-87d17.firebaseapp.com", databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com", projectId: "chat-system-87d17", storageBucket: "chat-system-87d17.firebasestorage.app", messagingSenderId: "988901895318", appId: "1:988901895318:web:b1736c54a224570253a6b7" };
-        if (typeof firebase !== 'undefined') { if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } db = firebase.database(); initChat(); }
+        const firebaseConfig = { 
+            databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com" // ⚡ 移除所有不必要的鉴权验证，直连实时数据库
+        };
+        if (typeof firebase !== 'undefined') { 
+            if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
+            db = firebase.database(); 
+            initChat(); 
+        }
     };
 
     function initChat() {
         const box = document.getElementById("messages");
-        // 🔒 精准接入 3号独立数据库节点
         db.ref("chats3/" + userId + "/messages").on("child_added", snap => {
             const msg = snap.val(); const container = document.createElement("div"); container.style.width = "100%"; container.style.marginBottom = "15px";
             let content; 
@@ -89,4 +93,11 @@
     }
 
     function sendText() { const input = document.getElementById("msg-input"); const text = input.value.trim(); if (!text || !db) return; pushMsg({ sender: "user", type: "text", text: text, timestamp: Date.now() }); input.value = ""; checkAndAutoReply(); }
-    function checkAndAutoReply() { db.ref("chats3/" + userId + "/messages").once("value", snap => { let count = 0; snap.forEach(() => { count++; }); if (count === 1) { setTimeout(() => { db.ref("chats3/" + userId + "/messages").
+    function checkAndAutoReply() { db.ref("chats3/" + userId + "/messages").once("value", snap => { let count = 0; snap.forEach(() => { count++; }); if (count === 1) { setTimeout(() => { db.ref("chats3/" + userId + "/messages").push({ sender: "admin", type: "text", text: welcomeText, timestamp: Date.now() }); db.ref("chats3/" + userId + "/info").set({ lastMsg: "甜甜: " + welcomeText, timestamp: Date.now() }); }, 1000); } }); }
+    function pushMsg(msgObj) { db.ref("chats3/" + userId + "/messages").push(msgObj); db.ref("chats3/" + userId + "/info").set({ lastMsg: msgObj.type === "image" ? "[图片]" : msgObj.text, timestamp: Date.now() }); }
+    function uploadFile(input) { const file = input.files[0]; if (!file || !db) return; const inputField = document.getElementById("msg-input"); inputField.placeholder = "正在加密传输图像..."; inputField.disabled = true; const reader = new FileReader(); reader.onload = function(e) { inputField.placeholder = "请输入您的问题..."; inputField.disabled = false; pushMsg({ sender: "user", type: "image", url: e.target.result, timestamp: Date.now() }); checkAndAutoReply(); }; reader.readAsDataURL(file); }
+    function updateImageSize(imgHtml, index) { if (imageItems[index]) { imageItems[index].w = imgHtml.naturalWidth || 1000; imageItems[index].h = imgHtml.naturalHeight || 1000; } }
+    function openPhotoSwipe(index) { var pswpElement = document.querySelectorAll('.pswp')[0]; var options = { index: index, bgOpacity: 0.85, showHideOpacity: true, history: false, shareEl: false, tapToClose: true }; var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, imageItems, options); gallery.init(); }
+</script>
+</body>
+</html>
