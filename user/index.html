@@ -1,75 +1,33 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HO体育客服官方线路</title>
-    <link id="web-icon" rel="shortcut icon" type="image/x-icon" href="https://ho-chat3.pages.dev/logo.webp">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>客服</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-database.min.js"></script>
-    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/photoswipe/4.1.3/photoswipe.min.css">
-    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/photoswipe/4.1.3/default-skin/default-skin.min.css">
-    <style>
-        /* 这里保留了你原本所有的样式 */
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100%; width: 100%; overflow: hidden; background: #eaeaea; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
-        .chat-container { width: 100%; max-width: 500px; height: 100%; background: #eaeaea; display: flex; flex-direction: column; margin: 0 auto; box-shadow: 0 0 20px rgba(0,0,0,0.08); }
-        .chat-header { background: linear-gradient(180deg, #00b85c 0%, #00a854 100%); color: #ffffff; padding: 14px 20px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; flex-shrink: 0; gap: 10px; z-index: 10; }
-        #messages { flex: 1; padding: 18px 14px; overflow-y: auto; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
-        .msg-row { display: flex; margin-bottom: 16px; width: 100%; align-items: flex-start; }
-        .msg-row.user { justify-content: flex-end; }
-        .msg-row.admin { justify-content: flex-start; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; background-size: contain; background-position: center; background-repeat: no-repeat; }
-        .user .avatar { background-color: #00bac7; margin-left: 10px; }
-        .admin .avatar { background-color: #ffffff; border: 1px solid #eee; background-image: url("https://ho-chat3.pages.dev/logo.webp"); margin-right: 10px; }
-        .bubble { max-width: calc(100% - 106px); padding: 11px 15px; border-radius: 14px; font-size: 15px; background: #fff; }
-        .user .bubble { background: #95ec69; }
-        .input-area { display: flex; align-items: center; padding: 10px 14px; background: #f6f6f6; border-top: 1px solid #dcdcdb; padding-bottom: calc(10px + env(safe-area-inset-bottom)); gap: 8px; }
-        #msg-input { flex: 1; height: 38px; padding: 0 14px; border: 1px solid #d3d3d2; border-radius: 19px; outline: none; }
-        .btn-send { background: #00a854; color: white; border: none; height: 38px; padding: 0 18px; border-radius: 19px; font-weight: bold; cursor: pointer; }
-    </style>
 </head>
 <body>
-<div class="chat-container">
-    <div class="chat-header">HO体育客服官方线路</div>
-    <div id="messages"></div>
-    <div class="input-area">
-        <label for="file-input" style="font-size:20px; cursor:pointer;">📎</label>
-        <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="uploadFile(this)">
-        <input type="text" id="msg-input" onkeydown="if(event.keyCode==13) sendText()">
-        <button class="btn-send" onclick="sendText()">发送</button>
-    </div>
-</div>
-<script>
-    var db; let userId = localStorage.getItem("chat_user_id3") || "粉丝_" + Math.random().toString(16).substring(2, 6);
-    localStorage.setItem("chat_user_id3", userId);
-    
-    window.onload = function() {
-        const firebaseConfig = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com/" };
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        db = firebase.database(); 
-        db.ref("chats3/" + userId + "/messages").on("child_added", snap => {
-            const msg = snap.val(); const box = document.getElementById("messages");
-            const div = document.createElement("div"); div.className = "msg-row " + (msg.sender === "user" ? "user" : "admin");
-            div.innerHTML = `<div class="bubble">${msg.type === "image" ? `<img src="${msg.url}" style="max-width:100%"/>` : msg.text}</div><div class="avatar"></div>`;
-            box.appendChild(div); box.scrollTop = box.scrollHeight;
+    <div id="messages" style="height:300px; overflow-y:scroll; border:1px solid #ccc;"></div>
+    <input type="text" id="msg-input">
+    <button onclick="sendMessage()">发送</button>
+    <script>
+        const config = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com/" };
+        if (!firebase.apps.length) firebase.initializeApp(config);
+        const db = firebase.database();
+        const uid = localStorage.uid || (localStorage.uid = "user_" + Math.random().toString(36).substr(2, 5));
+        
+        db.ref("chats3/" + uid + "/messages").on("child_added", s => {
+            const m = s.val();
+            document.getElementById("messages").innerHTML += `<div>${m.sender}: ${m.text}</div>`;
         });
-    };
-
-    function sendText() { 
-        const input = document.getElementById("msg-input"); const text = input.value.trim(); 
-        if (!text) return; 
-        pushMsg({ sender: "user", type: "text", text: text, timestamp: Date.now() }); 
-        input.value = ""; 
-    }
-    function pushMsg(data) {
-        db.ref("chats3/" + userId + "/messages").push(data);
-        db.ref("chats3/" + userId + "/info").set({ lastMsg: data.text || "[图片]", timestamp: Date.now() });
-    }
-    function uploadFile(input) { 
-        const reader = new FileReader(); reader.onload = (e) => pushMsg({ sender: "user", type: "image", url: e.target.result, timestamp: Date.now() });
-        reader.readAsDataURL(input.files[0]);
-    }
-</script>
+        
+        function sendMessage() {
+            const input = document.getElementById("msg-input");
+            if (!input.value) return;
+            db.ref("chats3/" + uid + "/messages").push({sender: "user", text: input.value, time: Date.now()});
+            input.value = "";
+        }
+    </script>
 </body>
 </html>
