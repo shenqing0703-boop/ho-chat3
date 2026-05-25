@@ -65,6 +65,7 @@
     var hasAdminReplied = false; 
 
     window.onload = function() {
+        // ⭐ 物理对齐尾部官方斜杠
         const firebaseConfig = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com/" };
         if (typeof firebase !== 'undefined') { 
             if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
@@ -92,7 +93,7 @@
         checkAndTriggerFirstWelcome();
     }
 
-    // 🔒 终极修正：补全底层缺失的 pushMsg 函数，彻底解决卡死和后台收发
+    // ⭐【史诗级 Bug 终结者】补全了老版底盘漏掉的粉丝发送核心推流函数！
     function sendText() { 
         const input = document.getElementById("msg-input"); 
         const text = input.value.trim(); 
@@ -127,7 +128,7 @@
                     pushMsg({ sender: "admin", type: "text", text: welcomeText, timestamp: Date.now() });
                 }
             });
-        }, 20000); 
+        }, 20000); // ⏱️ 严格20秒防撞车
     }
 
     function uploadFile(input) { 
