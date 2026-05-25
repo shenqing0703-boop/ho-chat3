@@ -67,7 +67,7 @@
     <script>
         var db; var currentChat = null; var unreadChats = {}; var flashInterval = null; var currentChatImageItems = [];
         window.onload = function() {
-            // 🔒 修复核心：拼接路径统一补全官方斜杠，彻底拉开通讯大闸
+            // ⭐ 物理对齐尾部官方斜杠
             const firebaseConfig = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com/" };
             if (typeof firebase !== 'undefined') { if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } db = firebase.database(); initAdminList(); }
         };
@@ -112,7 +112,7 @@
         function updateAdminImageSize(imgHtml, index) { if (currentChatImageItems[index]) { currentChatImageItems[index].w = imgHtml.naturalWidth || 1000; currentChatImageItems[index].h = imgHtml.naturalHeight || 1000; } }
         function openAdminPhotoSwipe(index) { var pswpElement = document.querySelectorAll('.pswp')[0]; var options = { index: index, bgOpacity: 0.9, showHideOpacity: true, shareEl: false, tapToClose: true }; var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, currentChatImageItems, options); gallery.init(); }
         
-        // 🔒 修复核心：对齐全局推流控制，防止假死锁
+        // ⭐ 彻底焊死后台发送控制流变量
         function sendText() { 
             const inputField = document.getElementById("msg-input"); 
             const contentText = inputField.value.trim(); 
