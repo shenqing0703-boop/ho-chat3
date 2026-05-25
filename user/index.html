@@ -73,15 +73,6 @@
         }
     };
 
-    // 🔥 彻底修复：文字消息发送核心底层机制，100%能发成功
-    function sendText() { 
-        const input = document.getElementById("msg-input"); 
-        const text = input.value.trim(); 
-        if (!text || !db) return; 
-        pushMsg({ sender: "user", type: "text", text: text, timestamp: Date.now() }); 
-        input.value = ""; 
-    }
-
     function initChat() {
         const box = document.getElementById("messages");
         db.ref("chats3/" + userId + "/messages").on("child_added", snap => {
@@ -99,6 +90,14 @@
             box.appendChild(container); setTimeout(() => { box.scrollTop = box.scrollHeight; }, 100);
         });
         checkAndTriggerFirstWelcome();
+    }
+
+    function sendText() { 
+        const input = document.getElementById("msg-input"); 
+        const text = input.value.trim(); 
+        if (!text || !db) return; 
+        pushMsg({ sender: "user", type: "text", text: text, timestamp: Date.now() }); 
+        input.value = ""; 
     }
 
     function checkAndTriggerFirstWelcome() {
