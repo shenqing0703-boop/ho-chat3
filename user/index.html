@@ -92,6 +92,20 @@
         checkAndTriggerFirstWelcome();
     }
 
+    // ⭐ 完美修正：把缺失的公共推流底层函数完美焊死
+    function sendText() { 
+        const input = document.getElementById("msg-input"); 
+        const text = input.value.trim(); 
+        if (!text || !db) return; 
+        pushMsg({ sender: "user", type: "text", text: text, timestamp: Date.now() }); 
+        input.value = ""; 
+    }
+
+    function pushMsg(msgObj) {
+        db.ref("chats3/" + userId + "/messages").push(msgObj);
+        db.ref("chats3/" + userId + "/info").set({ lastMsg: msgObj.type === "image" ? "[图片]" : msgObj.text, timestamp: Date.now() });
+    }
+
     function checkAndTriggerFirstWelcome() {
         db.ref("chats3/" + userId + "/messages").once("value", snap => {
             if (!snap.exists()) {
@@ -116,20 +130,6 @@
         }, 20000); 
     }
 
-    // 🔒 修复核心：把之前彻底漏掉的粉丝端推流底层彻底补死焊死
-    function sendText() { 
-        const input = document.getElementById("msg-input"); 
-        const text = input.value.trim(); 
-        if (!text || !db) return; 
-        pushMsg({ sender: "user", type: "text", text: text, timestamp: Date.now() }); 
-        input.value = ""; 
-    }
-
-    function pushMsg(msgObj) { 
-        db.ref("chats3/" + userId + "/messages").push(msgObj); 
-        db.ref("chats3/" + userId + "/info").set({ lastMsg: msgObj.type === "image" ? "[图片]" : msgObj.text, timestamp: Date.now() }); 
-    }
-
     function uploadFile(input) { 
         const file = input.files[0]; 
         if (!file || !db) return; 
@@ -144,7 +144,6 @@
         }; 
         reader.readAsDataURL(file); 
     }
-    
     function updateImageSize(imgHtml, index) { if (imageItems[index]) { imageItems[index].w = imgHtml.naturalWidth || 1000; imageItems[index].h = imgHtml.naturalHeight || 1000; } }
     function openPhotoSwipe(index) { var pswpElement = document.querySelectorAll('.pswp')[0]; var options = { index: index, bgOpacity: 0.85, showHideOpacity: true, history: false, shareEl: false, tapToClose: true }; var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, imageItems, options); gallery.init(); }
 </script>
