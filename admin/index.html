@@ -1,49 +1,43 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>后台</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-database.min.js"></script>
-    <style>
-        body { display: flex; height: 100vh; margin: 0; }
-        #list { width: 200px; border-right: 1px solid #ccc; overflow-y: auto; }
-        .main { flex: 1; display: flex; flex-direction: column; }
-        #msgs { flex: 1; overflow-y: auto; padding: 10px; background: #eee; }
-    </style>
 </head>
 <body>
-    <div id="list"></div>
-    <div class="main">
-        <div id="msgs"></div>
-        <div><input type="text" id="in"><button onclick="sendText()">发送</button></div>
+    <div id="list" style="float:left; width:100px;"></div>
+    <div style="margin-left:110px;">
+        <div id="msgs" style="height:300px; border:1px solid #ccc;"></div>
+        <input type="text" id="in"><button onclick="reply()">回复</button>
     </div>
     <script>
-        var db, currentChat;
         const config = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com/" };
-        firebase.initializeApp(config); db = firebase.database();
+        firebase.initializeApp(config);
+        const db = firebase.database();
+        let cur = "";
 
         db.ref("chats3").on("value", s => {
-            const list = document.getElementById("list"); list.innerHTML = "";
+            document.getElementById("list").innerHTML = "";
             s.forEach(u => {
                 const b = document.createElement("button"); b.innerText = u.key;
-                b.onclick = () => { currentChat = u.key; load(); };
-                list.appendChild(b);
+                b.onclick = () => { cur = u.key; load(); };
+                document.getElementById("list").appendChild(b);
             });
         });
 
         function load() {
             document.getElementById("msgs").innerHTML = "";
-            db.ref("chats3/"+currentChat+"/messages").on("child_added", s => {
+            db.ref("chats3/"+cur+"/messages").on("child_added", s => {
                 const m = s.val();
-                document.getElementById("msgs").innerHTML += `<div>${m.sender}: ${m.text || "[图片]"}</div>`;
+                document.getElementById("msgs").innerHTML += `<div>${m.sender}: ${m.text}</div>`;
             });
         }
 
-        function sendText() {
+        function reply() {
             const txt = document.getElementById("in").value;
-            db.ref("chats3/"+currentChat+"/messages").push({sender:"admin", text:txt, timestamp:Date.now()});
-            db.ref("chats3/"+currentChat+"/info").set({lastMsg: "小樱: "+txt, timestamp:Date.now()});
+            db.ref("chats3/"+cur+"/messages").push({sender: "admin", text: txt, time: Date.now()});
             document.getElementById("in").value = "";
         }
     </script>
