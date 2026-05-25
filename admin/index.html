@@ -110,7 +110,16 @@
         }
         function updateAdminImageSize(imgHtml, index) { if (currentChatImageItems[index]) { currentChatImageItems[index].w = imgHtml.naturalWidth || 1000; currentChatImageItems[index].h = imgHtml.naturalHeight || 1000; } }
         function openAdminPhotoSwipe(index) { var pswpElement = document.querySelectorAll('.pswp')[0]; var options = { index: index, bgOpacity: 0.9, showHideOpacity: true, shareEl: false, tapToClose: true }; var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, currentChatImageItems, options); gallery.init(); }
-        function sendText() { const inputField = document.getElementById("msg-input"); const contentText = inputField.value.trim(); if (!contentText || !currentChat || !db) return; pushMsg({ sender: "admin", type: "text", text: contentText, timestamp: Date.now() }); inputField.value = ""; }
+        
+        // 🔥 彻底修复：客服端发送核心逻辑
+        function sendText() { 
+            const inputField = document.getElementById("msg-input"); 
+            const contentText = inputField.value.trim(); 
+            if (!contentText || !currentChat || !db) return; 
+            pushMsg({ sender: "admin", type: "text", text: contentText, timestamp: Date.now() }); 
+            inputField.value = ""; 
+        }
+        
         function uploadFile(input) { const file = input.files[0]; if (!file || !currentChat || !db) return; const inputField = document.getElementById("msg-input"); inputField.placeholder = "正在加密传输图像..."; inputField.disabled = true; const reader = new FileReader(); reader.onload = function(e) { inputField.placeholder = "输入回复内容..."; inputField.disabled = false; pushMsg({ sender: "admin", type: "image", url: e.target.result, timestamp: Date.now() }); }; reader.readAsDataURL(file); }
         function pushMsg(msgObj) { db.ref("chats3/" + currentChat + "/messages").push(msgObj); db.ref("chats3/" + currentChat + "/info").set({ lastMsg: "小樱: " + (msgObj.type === "image" ? "[图片]" : msgObj.text), timestamp: Date.now() }); }
     </script>
