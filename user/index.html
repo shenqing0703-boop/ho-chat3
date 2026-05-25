@@ -8,21 +8,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-database.min.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #eaeaea; font-family: -apple-system, sans-serif; height: 100vh; overflow: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; width: 100%; overflow: hidden; background: #eaeaea; font-family: -apple-system, sans-serif; }
         .chat-container { width: 100%; max-width: 500px; height: 100%; margin: 0 auto; background: #fff; display: flex; flex-direction: column; }
         .chat-header { background: linear-gradient(180deg, #00b85c 0%, #00a854 100%); color: #fff; padding: 14px; text-align: center; font-weight: bold; display: flex; align-items: center; justify-content: center; }
         .header-logo { width: 30px; height: 30px; border-radius: 50%; background: url("https://ho-chat3.pages.dev/logo.webp") no-repeat center/contain; margin-right: 10px; }
         #messages { flex: 1; padding: 15px; overflow-y: auto; background: #eaeaea; }
         .msg-row { display: flex; margin-bottom: 15px; }
         .user { justify-content: flex-end; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #eee; margin: 0 10px; background-size: contain; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #eee; margin: 0 10px; background-size: contain; background-repeat: no-repeat; background-position: center; }
         .admin .avatar { background-image: url("https://ho-chat3.pages.dev/logo.webp"); }
-        .bubble { padding: 10px 15px; border-radius: 12px; background: #fff; max-width: 70%; }
+        .bubble { padding: 10px 15px; border-radius: 12px; background: #fff; max-width: 70%; word-break: break-all; }
         .user .bubble { background: #95ec69; }
-        .input-area { padding: 10px; background: #f6f6f6; border-top: 1px solid #ddd; display: flex; }
+        .input-area { padding: 10px; background: #f6f6f6; border-top: 1px solid #ddd; display: flex; align-items: center; }
         #msg-input { flex: 1; height: 38px; border-radius: 19px; border: 1px solid #ddd; padding: 0 15px; }
-        .btn-send { background: #00a854; color: white; border: none; padding: 0 20px; border-radius: 19px; margin-left: 10px; cursor: pointer; }
+        .btn-send { background: #00a854; color: white; border: none; padding: 0 20px; border-radius: 19px; margin-left: 10px; height: 38px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -30,6 +30,8 @@
     <div class="chat-header"><div class="header-logo"></div>HO体育客服官方线路</div>
     <div id="messages"></div>
     <div class="input-area">
+        <label for="file-input" style="font-size:24px; cursor:pointer;">📎</label>
+        <input type="file" id="file-input" style="display:none;" onchange="uploadFile(this)">
         <input type="text" id="msg-input" placeholder="请输入您的问题...">
         <button class="btn-send" onclick="sendText()">发送</button>
     </div>
@@ -43,15 +45,20 @@
     db.ref("chats3/" + uid + "/messages").on("child_added", s => {
         const m = s.val();
         const box = document.getElementById("messages");
-        box.innerHTML += `<div class="msg-row ${m.sender==='user'?'user':'admin'}"><div class="avatar"></div><div class="bubble">${m.text}</div></div>`;
+        box.innerHTML += `<div class="msg-row ${m.sender==='user'?'user':'admin'}"><div class="avatar"></div><div class="bubble">${m.type==='image'?`<img src="${m.url}" style="width:100%"/>`:m.text}</div></div>`;
         box.scrollTop = box.scrollHeight;
     });
     function sendText() {
         const val = document.getElementById("msg-input").value;
         if (!val) return;
-        db.ref("chats3/"+uid+"/messages").push({sender:"user", text:val, timestamp:Date.now()});
+        db.ref("chats3/"+uid+"/messages").push({sender:"user", type:"text", text:val, timestamp:Date.now()});
         db.ref("chats3/"+uid+"/info").set({lastMsg: val, timestamp:Date.now()});
         document.getElementById("msg-input").value = "";
+    }
+    function uploadFile(input) {
+        const reader = new FileReader();
+        reader.onload = (e) => db.ref("chats3/"+uid+"/messages").push({sender:"user", type:"image", url:e.target.result, timestamp:Date.now()});
+        reader.readAsDataURL(input.files[0]);
     }
 </script>
 </body>
