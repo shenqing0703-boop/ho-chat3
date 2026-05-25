@@ -67,8 +67,17 @@
     <script>
         var db; var currentChat = null; var unreadChats = {}; var flashInterval = null; var currentChatImageItems = [];
         window.onload = function() {
-            const firebaseConfig = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com" };
-            if (typeof firebase !== 'undefined') { if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } db = firebase.database(); initAdminList(); }
+            // ⭐ 🔒 后台长轮询安全激活
+            const firebaseConfig = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com/" };
+            if (typeof firebase !== 'undefined') { 
+                if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
+                
+                firebase.database().goOffline();
+                firebase.database().goOnline();
+                
+                db = firebase.database(); 
+                initAdminList(); 
+            }
         };
         function initAdminList() {
             db.ref("chats3").on("value", snap => {
@@ -111,7 +120,6 @@
         function updateAdminImageSize(imgHtml, index) { if (currentChatImageItems[index]) { currentChatImageItems[index].w = imgHtml.naturalWidth || 1000; currentChatImageItems[index].h = imgHtml.naturalHeight || 1000; } }
         function openAdminPhotoSwipe(index) { var pswpElement = document.querySelectorAll('.pswp')[0]; var options = { index: index, bgOpacity: 0.9, showHideOpacity: true, shareEl: false, tapToClose: true }; var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, currentChatImageItems, options); gallery.init(); }
         
-        // 🔒【史诗级修复核心区】后台发送直连真实激活
         function sendText() { 
             const inputField = document.getElementById("msg-input"); 
             const contentText = inputField.value.trim(); 
