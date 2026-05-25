@@ -6,7 +6,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-database.min.js"></script>
     <style>
-        body { display: flex; height: 100vh; margin: 0; font-family: sans-serif; }
+        body { display: flex; height: 100vh; margin: 0; font-family: -apple-system, sans-serif; }
         .sidebar { width: 280px; background: #fff; border-right: 1px solid #eee; overflow-y: auto; }
         .sidebar-header { padding: 15px; background: #fafafa; font-weight: bold; text-align: center; color: #00a854; border-bottom: 1px solid #eee; }
         .chat-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; }
@@ -26,8 +26,8 @@
         <div class="main-header"><div class="avatar"></div>客服接待室</div>
         <div id="messages"></div>
         <div class="input-area">
-            <input type="text" id="msg-input" style="flex:1; padding:10px;">
-            <button onclick="sendText()" style="padding:0 20px; background:#00a854; color:#fff; border:none;">发送</button>
+            <input type="text" id="msg-input" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px;">
+            <button onclick="sendText()" style="padding:0 20px; background:#00a854; color:#fff; border:none; margin-left:10px; cursor:pointer;">发送</button>
         </div>
     </div>
     <script>
@@ -50,7 +50,7 @@
             document.getElementById("messages").innerHTML = "";
             db.ref("chats3/"+cur+"/messages").on("child_added", s => {
                 const m = s.val();
-                document.getElementById("messages").innerHTML += `<div>${m.sender}: ${m.text}</div>`;
+                document.getElementById("messages").innerHTML += `<div>${m.sender}: ${m.type==='image'?'[图片]':m.text}</div>`;
             });
         }
 
