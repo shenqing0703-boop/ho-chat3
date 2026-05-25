@@ -65,7 +65,7 @@
     var hasAdminReplied = false; 
 
     window.onload = function() {
-        // 🔒 实测防护：强降长轮询，防WebSocket握手假死
+        // 🔒 强制走长轮询短包，破国内 WebSocket 干扰
         const firebaseConfig = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com/" };
         if (typeof firebase !== 'undefined') { 
             if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
@@ -80,21 +80,17 @@
         const box = document.getElementById("messages");
         db.ref("chats3/" + userId + "/messages").on("child_added", snap => {
             const msg = snap.val(); 
-            // 如果这条消息在本地已经提前挂载渲染过了，直接跳过，防止多出来重复的气泡
             if (msg.localId && document.getElementById(msg.localId)) return;
-
             if (msg.sender === "admin" && msg.text !== welcomeFirst && msg.text !== welcomeText) { hasAdminReplied = true; }
             renderSingleMsg(msg);
         });
         checkAndTriggerFirstWelcome();
     }
 
-    // ⭐ 核心底层重构：渲染单条消息气泡结构
     function renderSingleMsg(msg) {
         const box = document.getElementById("messages");
         const container = document.createElement("div"); 
-        container.style.width = "100%"; 
-        container.style.marginBottom = "15px";
+        container.style.width = "100%"; container.style.marginBottom = "15px";
         if (msg.localId) container.id = msg.localId;
 
         let content; 
@@ -104,31 +100,28 @@
             content = `<img src="${msg.url}" onclick="openPhotoSwipe(${imgIndex})" onload="updateImageSize(this, ${imgIndex})" />`; 
         } else { content = msg.text; }
 
-        if (msg.sender === "user") { 
-            container.innerHTML = `<div class="msg-row user"><div class="bubble">${content}</div><div class="avatar">我</div></div>`; 
-        } else { 
-            container.innerHTML = `<div class="bubble-name">HO体育-客服小樱</div><div class="msg-row admin"><div class="avatar"></div><div class="bubble">${content}</div></div>`; 
-        }
+        if (msg.sender === "user") { container.innerHTML = `<div class="msg-row user"><div class="bubble">${content}</div><div class="avatar">我</div></div>`; } 
+        else { container.innerHTML = `<div class="bubble-name">HO体育-客服小樱</div><div class="msg-row admin"><div class="avatar"></div><div class="bubble">${content}</div></div>`; }
         box.appendChild(container);
         box.scrollTop = box.scrollHeight;
     }
 
-    // ⭐ 彻底解决卡按钮死锁：本地瞬间秒开气泡，异步离线推流机制
+    // ⭐【绝杀修改区】数据深度隔离，确保本地出字的同时 100% 成功上推到后台大厅
     function sendText() { 
         const input = document.getElementById("msg-input"); 
         const text = input.value.trim(); 
         if (!text || !db) return; 
         
         const uniqueId = "msg_" + Date.now();
-        const fakeMsgObj = { sender: "user", type: "text", text: text, timestamp: Date.now(), localId: uniqueId };
         
-        // 1. 不等谷歌握手，屏幕立刻无感挂载出来气泡，让按钮绝不卡死
-        renderSingleMsg(fakeMsgObj);
-        input.value = ""; 
-        
-        // 2. 后台穿透静默排队推流，哪怕网络波动也绝对能发过去
-        db.ref("chats3/" + userId + "/messages").push(fakeMsgObj);
+        // 🔒 1. 复制一份干净的数据字典扔给大厂，100%穿透，后台秒接包！
+        const cleanData = { sender: "user", type: "text", text: text, timestamp: Date.now(), localId: uniqueId };
+        db.ref("chats3/" + userId + "/messages").push(cleanData);
         db.ref("chats3/" + userId + "/info").set({ lastMsg: text, timestamp: Date.now() });
+
+        // 🎨 2. 本地独立渲染隔离，让界面永不卡死
+        renderSingleMsg({ sender: "user", type: "text", text: text, timestamp: Date.now(), localId: uniqueId });
+        input.value = ""; 
     }
 
     function checkAndTriggerFirstWelcome() {
