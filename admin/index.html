@@ -2,21 +2,33 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>客服管理</title>
+    <title>客服管理后台</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-database.min.js"></script>
     <style>
-        body { display: flex; height: 100vh; margin: 0; }
-        #list { width: 200px; border-right: 1px solid #ccc; }
-        .main { flex: 1; display: flex; flex-direction: column; }
-        #msgs { flex: 1; overflow-y: auto; background: #eee; padding: 10px; }
+        body { display: flex; height: 100vh; margin: 0; font-family: sans-serif; }
+        .sidebar { width: 280px; background: #fff; border-right: 1px solid #eee; overflow-y: auto; }
+        .sidebar-header { padding: 15px; background: #fafafa; font-weight: bold; text-align: center; color: #00a854; border-bottom: 1px solid #eee; }
+        .chat-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; }
+        .main { flex: 1; display: flex; flex-direction: column; background: #f5f5f5; }
+        .main-header { padding: 15px; background: #fff; border-bottom: 1px solid #eee; display: flex; align-items: center; }
+        .avatar { width: 34px; height: 34px; border-radius: 50%; background: url("https://ho-chat3.pages.dev/logo.webp") no-repeat center/contain; margin-right: 10px; }
+        #messages { flex: 1; padding: 20px; overflow-y: auto; }
+        .input-area { padding: 20px; background: #fff; display: flex; }
     </style>
 </head>
 <body>
-    <div id="list"></div>
+    <div class="sidebar">
+        <div class="sidebar-header">HO体育 接待大厅</div>
+        <div id="list"></div>
+    </div>
     <div class="main">
-        <div id="msgs"></div>
-        <div><input type="text" id="in"><button onclick="sendText()">回复</button></div>
+        <div class="main-header"><div class="avatar"></div>客服接待室</div>
+        <div id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="msg-input" style="flex:1; padding:10px;">
+            <button onclick="sendText()" style="padding:0 20px; background:#00a854; color:#fff; border:none;">发送</button>
+        </div>
     </div>
     <script>
         const config = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com/" };
@@ -25,27 +37,27 @@
         let cur = "";
 
         db.ref("chats3").on("value", s => {
-            document.getElementById("list").innerHTML = "";
+            const list = document.getElementById("list"); list.innerHTML = "";
             s.forEach(u => {
-                const b = document.createElement("button"); b.innerText = u.key;
-                b.onclick = () => { cur = u.key; load(); };
-                document.getElementById("list").appendChild(b);
+                const div = document.createElement("div"); div.className = "chat-item";
+                div.innerHTML = `<div>${u.key}</div>`;
+                div.onclick = () => { cur = u.key; load(); };
+                list.appendChild(div);
             });
         });
 
         function load() {
-            document.getElementById("msgs").innerHTML = "";
-            db.ref("chats3/" + cur + "/messages").on("child_added", s => {
+            document.getElementById("messages").innerHTML = "";
+            db.ref("chats3/"+cur+"/messages").on("child_added", s => {
                 const m = s.val();
-                document.getElementById("msgs").innerHTML += `<div>${m.sender}: ${m.text || "[图片]"}</div>`;
+                document.getElementById("messages").innerHTML += `<div>${m.sender}: ${m.text}</div>`;
             });
         }
 
         function sendText() {
-            const txt = document.getElementById("in").value;
-            db.ref("chats3/" + cur + "/messages").push({sender: "admin", text: txt, timestamp: Date.now()});
-            db.ref("chats3/" + cur + "/info").set({lastMsg: "小樱: "+txt, timestamp: Date.now()});
-            document.getElementById("in").value = "";
+            const txt = document.getElementById("msg-input").value;
+            db.ref("chats3/"+cur+"/messages").push({sender: "admin", text: txt, timestamp: Date.now()});
+            document.getElementById("msg-input").value = "";
         }
     </script>
 </body>
