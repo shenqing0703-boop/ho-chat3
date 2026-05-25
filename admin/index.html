@@ -67,7 +67,8 @@
     <script>
         var db; var currentChat = null; var unreadChats = {}; var flashInterval = null; var currentChatImageItems = [];
         window.onload = function() {
-            const firebaseConfig = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com" };
+            // 🔒【唯一修复点】焊死结尾的官方反斜杠与纯净字符串，彻底击碎空isEmpty崩溃
+            const firebaseConfig = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com/" };
             if (typeof firebase !== 'undefined') { if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } db = firebase.database(); initAdminList(); }
         };
         function initAdminList() {
