@@ -1,16 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>后台</title>
+    <title>客服管理</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-database.min.js"></script>
+    <style>
+        body { display: flex; height: 100vh; margin: 0; }
+        #list { width: 200px; border-right: 1px solid #ccc; }
+        .main { flex: 1; display: flex; flex-direction: column; }
+        #msgs { flex: 1; overflow-y: auto; background: #eee; padding: 10px; }
+    </style>
 </head>
 <body>
-    <div id="list" style="float:left; width:100px;"></div>
-    <div style="margin-left:110px;">
-        <div id="msgs" style="height:300px; border:1px solid #ccc;"></div>
-        <input type="text" id="in"><button onclick="reply()">回复</button>
+    <div id="list"></div>
+    <div class="main">
+        <div id="msgs"></div>
+        <div><input type="text" id="in"><button onclick="sendText()">回复</button></div>
     </div>
     <script>
         const config = { databaseURL: "https://chat-system-87d17-default-rtdb.firebaseio.com/" };
@@ -29,15 +35,16 @@
 
         function load() {
             document.getElementById("msgs").innerHTML = "";
-            db.ref("chats3/"+cur+"/messages").on("child_added", s => {
+            db.ref("chats3/" + cur + "/messages").on("child_added", s => {
                 const m = s.val();
-                document.getElementById("msgs").innerHTML += `<div>${m.sender}: ${m.text}</div>`;
+                document.getElementById("msgs").innerHTML += `<div>${m.sender}: ${m.text || "[图片]"}</div>`;
             });
         }
 
-        function reply() {
+        function sendText() {
             const txt = document.getElementById("in").value;
-            db.ref("chats3/"+cur+"/messages").push({sender: "admin", text: txt, time: Date.now()});
+            db.ref("chats3/" + cur + "/messages").push({sender: "admin", text: txt, timestamp: Date.now()});
+            db.ref("chats3/" + cur + "/info").set({lastMsg: "小樱: "+txt, timestamp: Date.now()});
             document.getElementById("in").value = "";
         }
     </script>
